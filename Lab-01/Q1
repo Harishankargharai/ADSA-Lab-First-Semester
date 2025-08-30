@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+
+#define N 1000000  // Large n for evaluation
+#define SIZE 12
+
+typedef struct {
+    char name[30];
+    long double value;
+} Function;
+
+// Bubble sort for simplicity
+void bubbleSort(Function arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j].value > arr[j + 1].value) {
+                Function temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    Function funcs[SIZE];
+
+    strcpy(funcs[0].name, "1/n");
+    funcs[0].value = 1.0 / N;
+
+    strcpy(funcs[1].name, "log2(n)");
+    funcs[1].value = log2(N);
+
+    strcpy(funcs[2].name, "2^32 * n");
+    funcs[2].value = pow(2, 32) * N;
+
+    strcpy(funcs[3].name, "12*sqrt(n)");
+    funcs[3].value = 12 * sqrt(N);
+
+    strcpy(funcs[4].name, "50*n^0.5");
+    funcs[4].value = 50 * pow(N, 0.5);
+
+    strcpy(funcs[5].name, "n^0.51");
+    funcs[5].value = pow(N, 0.51);
+
+    strcpy(funcs[6].name, "n log2(n)");
+    funcs[6].value = N * log2(N);
+
+    strcpy(funcs[7].name, "100n^2 + 6n");
+    funcs[7].value = 100 * pow(N, 2) + 6 * N;
+
+    strcpy(funcs[8].name, "n^2 - 324");
+    funcs[8].value = pow(N, 2) - 324;
+
+    strcpy(funcs[9].name, "2n^3");
+    funcs[9].value = 2 * pow(N, 3);
+
+    strcpy(funcs[10].name, "n^(log2 n)");
+    funcs[10].value = pow(N, log2(N)); // Extremely large
+
+    strcpy(funcs[11].name, "3^n");
+    funcs[11].value = INFINITY; // Too large to compute
+
+    // Sort functions using bubble sort
+    bubbleSort(funcs, SIZE);
+
+    // Print sorted order
+    printf("Order of functions by growth for n = %d:\n", N);
+    for (int i = 0; i < SIZE; i++) {
+        printf("%d. %s -> %.2Le\n", i + 1, funcs[i].name, funcs[i].value);
+    }
+
+    return 0;
+}
