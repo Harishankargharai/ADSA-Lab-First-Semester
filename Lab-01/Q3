@@ -1,0 +1,231 @@
+// Algorithm for detecting defective coin
+
+// Key Steps
+
+// Divide coins into 2 equal groups
+// Weigh left group vs right group
+// Conquer: Recursively search the lighter group
+// Base case: When down to 1-2 coins, direct comparison
+
+// Implementation
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to simulate weighing coins on a balance scale
+// Returns: -1 if left < right, 1 if left > right, 0 if equal
+int weigh_coins(int coins[], int left_start, int left_end, int right_start, int right_end) {
+    int left_weight = 0, right_weight = 0;
+    
+    // Calculate left group weight
+    for (int i = left_start; i <= left_end; i++) {
+        left_weight += coins[i];
+    }
+    
+    // Calculate right group weight  
+    for (int i = right_start; i <= right_end; i++) {
+        right_weight += coins[i];
+    }
+    
+    printf("Weighing: Left group [%d-%d] weight=%d vs Right group [%d-%d] weight=%d\n", 
+           left_start, left_end, left_weight, right_start, right_end, right_weight);
+    
+    if (left_weight < right_weight) return -1;
+    if (left_weight > right_weight) return 1;
+    return 0;
+}
+
+// Main recursive function to find lighter coin using binary search
+int find_lighter_coin(int coins[], int start, int end, int* weighings_count) {
+    (*weighings_count)++;
+    
+    int n = end - start + 1;
+    
+    printf("Searching in range [%d-%d] with %d coins\n", start, end, n);
+    
+    // Base cases
+    if (n == 1) {
+        printf("Only one coin left at index %d\n", start);
+        return start;
+    }
+    
+    if (n == 2) {
+        // Two coins - weigh against each other
+        int result = weigh_coins(coins, start, start, start + 1, start + 1);
+        if (result == -1) {
+            printf("Coin at index %d is lighter\n", start);
+            return start;
+        } else if (result == 1) {
+            printf("Coin at index %d is lighter\n", start + 1);
+            return start + 1;
+        } else {
+            printf("Both coins are normal\n");
+            return -1; // Both coins are normal
+        }
+    }
+    
+    // Binary division
+    int mid = start + n / 2;
+    int left_size = mid - start;
+    int right_size = end - mid + 1;
+    
+    if (left_size == right_size) {
+        // Equal sized groups - direct comparison
+        int result = weigh_coins(coins, start, mid - 1, mid, end);
+        
+        if (result == -1) {
+            // Left group is lighter
+            printf("Defective coin is in left group\n");
+            return find_lighter_coin(coins, start, mid - 1, weighings_count);
+        } else if (result == 1) {
+            // Right group is lighter
+            printf("Defective coin is in right group\n");
+            return find_lighter_coin(coins, mid, end, weighings_count);
+        } else {
+            // Both groups equal - no defective coin
+            printf("Both groups equal - no defective coin\n");
+            return -1;
+        }
+    } else {
+        // Unequal sized groups - handle the extra coin
+        // Strategy: Set aside one coin, make equal groups
+        int set_aside = end;
+        int new_end = end - 1;
+        int new_mid = start + (new_end - start + 1) / 2;
+        
+        printf("Odd number of coins - setting aside coin at index %d\n", set_aside);
+        
+        int result = weigh_coins(coins, start, new_mid - 1, new_mid, new_end);
+        
+        if (result == -1) {
+            // Left group is lighter
+            printf("Defective coin is in left group\n");
+            return find_lighter_coin(coins, start, new_mid - 1, weighings_count);
+        } else if (result == 1) {
+            // Right group is lighter  
+            printf("Defective coin is in right group\n");
+            return find_lighter_coin(coins, new_mid, new_end, weighings_count);
+        } else {
+            // Both groups equal - defective coin is the set-aside coin (if any)
+            printf("Both groups equal - checking set-aside coin\n");
+            // Compare set-aside coin with a normal coin
+            int normal_coin_idx = start; // assume first coin in equal groups is normal
+            int compare_result = weigh_coins(coins, set_aside, set_aside, normal_coin_idx, normal_coin_idx);
+            
+            if (compare_result == -1) {
+                printf("Set-aside coin at index %d is the defective coin\n", set_aside);
+                return set_aside;
+            } else {
+                printf("No defective coin found\n");
+                return -1;
+            }
+        }
+    }
+}
+
+// Wrapper function to start the search
+int detect_fake_coin(int coins[], int n) {
+    printf("=== Starting Fake Coin Detection ===\n");
+    printf("Total coins: %d\n", n);
+    printf("Coins: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", coins[i]);
+    }
+    printf("\n\n");
+    
+    int weighings = 0;
+    int result = find_lighter_coin(coins, 0, n - 1, &weighings);
+    
+    printf("\n=== Result ===\n");
+    printf("Total weighings used: %d\n", weighings);
+    printf("Theoretical maximum weighings: %d\n", (int)ceil(log2(n)));
+    
+    if (result == -1) {
+        printf("No defective coin found - all coins are normal\n");
+    } else {
+        printf("Defective (lighter) coin found at index: %d\n", result);
+    }
+    
+    return result;
+}
+
+// Test function
+void run_tests() {
+    printf("==========================================\n");
+    printf("TESTING FAKE COIN DETECTION ALGORITHM\n");
+    printf("==========================================\n\n");
+    
+    // Test Case 1: No defective coin
+    printf("TEST 1: All coins are normal\n");
+    int coins1[] = {10, 10, 10, 10, 10, 10, 10, 10};
+    int n1 = sizeof(coins1) / sizeof(coins1[0]);
+    detect_fake_coin(coins1, n1);
+    printf("\n");
+    
+    // Test Case 2: Defective coin at index 3
+    printf("TEST 2: Defective coin at index 3\n");
+    int coins2[] = {10, 10, 10, 8, 10, 10, 10, 10};
+    int n2 = sizeof(coins2) / sizeof(coins2[0]);
+    detect_fake_coin(coins2, n2);
+    printf("\n");
+    
+    // Test Case 3: Defective coin at index 0
+    printf("TEST 3: Defective coin at index 0\n");
+    int coins3[] = {8, 10, 10, 10, 10, 10, 10, 10};
+    int n3 = sizeof(coins3) / sizeof(coins3[0]);
+    detect_fake_coin(coins3, n3);
+    printf("\n");
+    
+    // Test Case 4: Odd number of coins
+    printf("TEST 4: Odd number of coins (7), defective at index 2\n");
+    int coins4[] = {10, 10, 8, 10, 10, 10, 10};
+    int n4 = sizeof(coins4) / sizeof(coins4[0]);
+    detect_fake_coin(coins4, n4);
+    printf("\n");
+    
+    // Test Case 5: Small case - 3 coins
+    printf("TEST 5: Small case - 3 coins, defective at index 1\n");
+    int coins5[] = {10, 8, 10};
+    int n5 = sizeof(coins5) / sizeof(coins5[0]);
+    detect_fake_coin(coins5, n5);
+    printf("\n");
+}
+
+// Function to demonstrate algorithm complexity
+void analyze_complexity() {
+    printf("==========================================\n");
+    printf("ALGORITHM COMPLEXITY ANALYSIS\n");
+    printf("==========================================\n");
+    
+    printf("Time Complexity: O(log₂ n)\n");
+    printf("Space Complexity: O(log₂ n) - due to recursion stack\n\n");
+    
+    printf("Maximum weighings needed for different n:\n");
+    int test_sizes[] = {1, 2, 3, 4, 5, 8, 10, 16, 32, 64, 100, 1000};
+    int num_tests = sizeof(test_sizes) / sizeof(test_sizes[0]);
+    
+    for (int i = 0; i < num_tests; i++) {
+        int n = test_sizes[i];
+        int max_weighings = (n <= 1) ? 0 : (int)ceil(log2(n));
+        printf("n = %4d → max weighings = %d\n", n, max_weighings);
+    }
+    printf("\n");
+}
+
+int main() {
+    run_tests();
+    analyze_complexity();
+    
+    printf("==========================================\n");
+    printf("ALGORITHM SUMMARY\n");
+    printf("==========================================\n");
+    printf("Problem: Find lighter defective coin among n coins\n");
+    printf("Constraint: At most 1 defective coin, can only be lighter\n");
+    printf("Tool: Balance weighing scale\n");
+    printf("Approach: Binary search (divide and conquer)\n");
+    printf("Time Complexity: O(log₂ n + c)\n");
+    printf("Optimal: Yes - uses minimum possible weighings\n");
+    
+    return 0;
+}
