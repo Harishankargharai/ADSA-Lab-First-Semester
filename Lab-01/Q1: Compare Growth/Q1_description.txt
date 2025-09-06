@@ -1,0 +1,8 @@
+Execution Time Simulator : Uses each function’s value as the basis for a dummy loop to simulate computational effort.
+                           Measures the actual execution time for increasing n
+Function Growth Plotter (C + Gnuplot) : Plots them using gnuplot for a visual comparison
+                                        Helps in understanding how functions increase relative to each other as n grows.
+
+The plot program helps us visualize growth trends, while the timing program shows how these
+trends translate into real computational cost. 
+Used together, they provide both theoretical and experimental insight into complexity analysis.
