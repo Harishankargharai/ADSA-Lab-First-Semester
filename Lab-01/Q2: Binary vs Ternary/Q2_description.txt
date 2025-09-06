@@ -1,0 +1,11 @@
+For small arrays, both Binary and Ternary Search execute so quickly that their CPU time looks identical.
+Therefore Instead of time, we can count the number of comparisons each algorithm makes.
+
+At first glance, Ternary Search sounds like it should be faster, 
+since it divides the array into three parts instead of two.
+Although ternary has fewer steps, but each step is more expensive (extra comparisons)
+than binary search.
+
+At least 2 comparison per step(ternary) vs Only one comparison per step(binary)
+
+So, Binary Search ends up doing fewer comparisons overall.
