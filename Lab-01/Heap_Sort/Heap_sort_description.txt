@@ -1,0 +1,6 @@
+Build a Max Heap from the input array.
+Repeat until the heap is empty:
+   - Swap the root (maximum element) with the last element.
+   - Reduce the heap size by 1.
+   - Heapify the root to restore max-heap property.
+After all steps, the array will be sorted in ascending order.
