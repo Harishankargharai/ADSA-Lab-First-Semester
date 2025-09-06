@@ -1,0 +1,3 @@
+Key Idea:
+Each weighing reduces the search space by about half,
+so the number of weighings required is bounded by log₂ n, plus a constant factor for base cases.
